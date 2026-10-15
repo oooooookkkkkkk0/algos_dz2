@@ -1,0 +1,108 @@
+class Node:
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+
+    def add(self, key):
+        if self.root is None:
+            self.root = Node(key)
+            return
+        current = self.root
+        while True:
+            if key == current.key:
+                return
+            elif key < current.key:
+                if current.left is None:
+                    current.left = Node(key)
+                    return
+                current = current.left
+            else:
+                if current.right is None:
+                    current.right = Node(key)
+                    return
+                current = current.right
+
+    def exists(self, key):
+        current = self.root
+        while current is not None:
+            if key == current.key:
+                return True
+            elif key < current.key:
+                current = current.left
+            else:
+                current = current.right
+        return False
+
+    def delete(self, key):
+        self.root = self._delete(self.root, key)
+
+    def _delete(self, node, key):
+        if node is None:
+            return None
+        if key < node.key:
+            node.left = self._delete(node.left, key)
+        elif key > node.key:
+            node.right = self._delete(node.right, key)
+        else:
+            if node.left is None and node.right is None:
+                return None
+            if node.left is None:
+                return node.right
+            if node.right is None:
+                return node.left
+            successor = node.right
+            while successor.left is not None:
+                successor = successor.left
+            node.key = successor.key
+            node.right = self._delete(node.right, successor.key)
+        return node
+
+    def height(self):
+        if self.root is None:
+            return 0
+        max_height = 0
+        stack = [(self.root, 1)]
+        while stack:
+            node, depth = stack.pop()
+            max_height = max(max_height, depth)
+            if node.left is not None:
+                stack.append((node.left, depth + 1))
+            if node.right is not None:
+                stack.append((node.right, depth + 1))
+        return max_height
+
+    def print_tree(self):
+        if self.root is None:
+            print("Empty")
+            return
+        result = []
+        stack = [self.root]
+        while stack:
+            node = stack.pop()
+            result.append(str(node.key))
+            if node.right is not None:
+                stack.append(node.right)
+            if node.left is not None:
+                stack.append(node.left)
+        print(" ".join(result))
+
+tree = BinarySearchTree()
+q = int(input())
+for _ in range(q):
+    command = input().split()
+    operation = command[0]
+    if operation == "add":
+        tree.add(int(command[1]))
+    elif operation == "del":
+        tree.delete(int(command[1]))
+    elif operation == "exists":
+        print("YES" if tree.exists(int(command[1])) else "NO")
+    elif operation == "height":
+        print(tree.height())
+    elif operation == "print":
+        tree.print_tree()
